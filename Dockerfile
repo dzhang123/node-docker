@@ -1,15 +1,17 @@
-# syntax = docker/dockerfile:1
+# syntax=docker/dockerfile:1
+FROM node:18-alpine as base
 
-FROM node:18-alpine
+WORKDIR /code
 
-ENV NODE_ENV=production
+COPY package.json package.json
+COPY package-lock.json package-lock.json
 
-WORKDIR /app
-
-COPY ["package.json", "package-lock.json", "./"]
-
-RUN npm install --production
-
+FROM base as test
+RUN npm ci
 COPY . .
+RUN npm run test
 
-CMD ["node", "server.js"]
+FROM base as prod
+RUN npm ci --production
+COPY . .
+CMD [ "node", "server.js" ]
