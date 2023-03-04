@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
  notes:
+  image: registry.hub.docker.com/library/node:18-alpine
   build:
    context: .
   ports:
@@ -16,12 +17,20 @@ services:
   command: npm run debug
 
  mongo:
-  image: mongo:4.2.8
+  image: registry.hub.docker.com/library/mongo:4.2.8
   ports:
    - 27017:27017
   volumes:
    - mongodb:/data/db
-   - mongodb_config:/data/configdb
+   - mongodb-config:/data/configdb
 volumes:
  mongodb:
- mongodb_config:
+   driver: azure_file
+   driver_opts:
+      share_name: myacifileshare
+      storage_account_name: myacistorageaccount
+ mongodb-config:
+   driver: azure_file
+   driver_opts:
+      share_name: myacifileshare
+      storage_account_name: myacistorageaccount
